@@ -13,11 +13,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //text controller
+  final _controller = TextEditingController();
   //list todo
   List toDoList = [
     ["make tutorial", false],
     ["Bringle", false],
   ];
+  //save new task
+  void saveNewTask() {
+    setState(() {
+      toDoList.add([_controller.text, false]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+  }
 
   //checkbox was tapped
   void checkBoxChanged(bool? value, int index) {
@@ -31,9 +41,20 @@ class _HomePageState extends State<HomePage> {
     showDialog(
       context: context,
       builder: (context) {
-        return DialogBox();
+        return DialogBox(
+          controller: _controller,
+          onSave: saveNewTask,
+          onCancel: () => Navigator.of(context).pop(),
+        );
       },
     );
+  }
+
+  //delete task
+  void deleteTask(int index) {
+    setState(() {
+      toDoList.removeAt(index);
+    });
   }
 
   @override
@@ -54,14 +75,16 @@ class _HomePageState extends State<HomePage> {
         itemCount: toDoList.length,
         itemBuilder: (context, index) {
           return ToDoTile(
-              taskName: toDoList[index][0],
-              takCompleted: toDoList[index][1],
-              onChanged: (value) {
-                checkBoxChanged(
-                  value,
-                  index,
-                );
-              });
+            taskName: toDoList[index][0],
+            takCompleted: toDoList[index][1],
+            onChanged: (value) {
+              checkBoxChanged(
+                value,
+                index,
+              );
+            },
+            deleteFunction: (context) => deleteTask(index),
+          );
         },
       ),
       // body: ListView(
